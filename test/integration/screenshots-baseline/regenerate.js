@@ -59,14 +59,33 @@ async function generateBaselineScreenshots(page) {
     page.setViewport(breakpoints[i]);
     // Index.
     await page.goto('http://127.0.0.1:4444/');
-    await page.screenshot({path: `${baselineDir}/${prefix}/index.png`});
+    // wait for view1 to load
+    await page.waitForFunction(selector => 
+      !!document.querySelector('my-app').shadowRoot.querySelector(selector).active,
+      {},
+      "my-view1"
+    );      
+  await page.screenshot({path: `${baselineDir}/${prefix}/index.png`});
     // Views.
     for (let i = 1; i <= 3; i++) {
       await page.goto(`http://127.0.0.1:4444/view${i}`);
+      // wait for page to load
+      await page.waitForFunction(selector => 
+        !!document.querySelector('my-app').shadowRoot.querySelector(selector).active,
+        {},
+        `my-view${i}`
+      );      
       await page.screenshot({path: `${baselineDir}/${prefix}/view${i}.png`});
     }
     // 404.
     await page.goto('http://127.0.0.1:4444/batmanNotAView');
+    // wait for 404
+    await page.waitForFunction(selector => 
+      !!document.querySelector('my-app').shadowRoot.querySelector(selector).active,
+      {},
+      `my-view404`
+    );      
+
     await page.screenshot({path: `${baselineDir}/${prefix}/batmanNotAView.png`});
   }
 }

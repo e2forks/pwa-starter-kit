@@ -97,6 +97,15 @@ async function takeAndCompareScreenshot(page, route, filePrefix) {
   let fileName = filePrefix + '/' + (route ? route : 'index');
 
   await page.goto(`http://127.0.0.1:4444/${route}`);
+
+  // wait for page to render
+  const selector = /view/.test(route) || !route ? `my-${route || "view1"}` : 'my-view404';
+  await page.waitForFunction(selector => 
+    !!document.querySelector('my-app').shadowRoot.querySelector(selector).active,
+    {},
+    selector
+  );
+  
   await page.screenshot({path: `${currentDir}/${fileName}.png`});
   return compareScreenshots(fileName);
 }
