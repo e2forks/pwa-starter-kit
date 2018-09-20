@@ -5,7 +5,8 @@ import {
   Action,
   AnyAction,
   StoreEnhancer,
-  StoreEnhancerStoreCreator
+  StoreEnhancerStoreCreator,
+  combineReducers
 } from "redux";
 
 export interface ICombineReducers<S> {
@@ -21,6 +22,13 @@ export interface ICombineReducers<S, A extends Action = AnyAction> {
   able to lazily install their reducers. This is a store enhancer that
   enables that.
 
+  @template S The type of state held by this store.
+  @template A the type of actions which may be dispatched by this store.
+  @template Ext Store extension that is mixed into the Store type.
+  @template StateExt State extension that is mixed into the state type.
+
+  @return enhanced store with a `addReducers` method.
+  
   @example
   // Sample use (where you define your redux store, in store.js):
   import lazyReducerEnhancer from '../node_modules/pwa-helpers/lazy-reducer-enhancer.js';
@@ -37,17 +45,25 @@ export interface ICombineReducers<S, A extends Action = AnyAction> {
   });
 */
 export declare function lazyReducerEnhancer<
-  Ext,
-  StateExt,
   S,
-  A extends Action = AnyAction
+  A extends Action = AnyAction,
+  Ext = {},
+  StateExt = {}
 >(
-  combineReducers: ICombineReducers<S, A>
-): (
-  next: StoreEnhancerStoreCreator<Ext, StateExt>
-) => StoreEnhancerStoreCreator<Ext & ILazyReducerStore<S, A>, StateExt>;
+  _combineReducers: typeof combineReducers
+): StoreEnhancer<Ext & ILazyReducerStore<S, A>, StateExt>
 
+/**
+ * Interface for a store enhanced with `lazyReducerEnhancer`.
+ *
+ * @template S The type of state held by this store.
+ * @template A the type of actions which may be dispatched by this store.
+ */
 export interface ILazyReducerStore<S, A extends Action = AnyAction>
   extends Store<S, A> {
+  /**
+   * Lazily loads reducers.
+   * @param reducers Object whose values correspond to different reducer functions.
+   */
   addReducers(reducers: ReducersMapObject<S, A>): void;
 }

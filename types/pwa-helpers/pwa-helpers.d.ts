@@ -1,5 +1,8 @@
 export { connect } from "./connect-mixin";
-export { lazyReducerEnhancer } from "./lazy-reducer-enhancer";
+export {
+  lazyReducerEnhancer,
+  ILazyReducerStore
+} from "./lazy-reducer-enhancer";
 export { installMediaQueryWatcher } from "./media-query";
 export { updateMetadata } from "./metadata";
 export { installOfflineWatcher } from "./network";
