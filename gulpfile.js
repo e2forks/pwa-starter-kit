@@ -11,7 +11,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 const gulp = require('gulp');
 const rename = require('gulp-rename');
 const replace = require('gulp-replace');
+const ts = require("gulp-typescript");
 const del = require('del');
+const merge = require('merge2');
+
+/** typescript project */
+const tsProject = ts.createProject('tsconfig.json');
+
 
 /**
  * Cleans the prpl-server build in the server directory.
@@ -41,3 +47,21 @@ gulp.task('prpl-server', gulp.series(
   'prpl-server:clean',
   'prpl-server:build'
 ));
+
+gulp.task('tsc:compile', function() {
+
+  var tsResult = gulp.src(['ts/*.ts', 'ts/**/*.ts'])
+                  .pipe(tsProject());
+
+  return merge([ // Merge the two output streams, so this task is finished         when the IO of both operations are done. 
+      tsResult.dts.pipe(gulp.dest('src')),
+      tsResult.js.pipe(gulp.dest('src'))
+  ]);
+});
+
+/**
+ * Watch for typescript source changes and re-compile
+ */
+gulp.task('tsc:watch', function() {
+  gulp.watch(['ts/*.ts', 'ts/**/*.ts'], gulp.task('tsc:compile'));
+});
